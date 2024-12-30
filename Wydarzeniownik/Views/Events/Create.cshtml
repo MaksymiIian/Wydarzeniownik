@@ -1,0 +1,44 @@
+﻿@model Wydarzeniownik.Models.Event
+
+@{
+    ViewData["Title"] = "Dodaj nowe wydarzenie";
+}
+
+<div class="container">
+    <h1 class="my-4">Dodaj nowe wydarzenie</h1>
+
+    <form asp-action="Create" method="post">
+        <div class="form-group">
+            <label asp-for="Title" class="form-label">Tytuł</label>
+            <input asp-for="Title" class="form-control" required />
+            <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+
+        <!-- Wybór daty -->
+        <div class="form-group">
+            <label asp-for="Date" class="form-label">Data</label>
+            <input asp-for="Date" type="date" class="form-control" min="@DateTime.Now.ToString("yyyy-MM-dd")" value=" " required  />
+            <span asp-validation-for="Date" class="text-danger"></span>
+        </div>
+
+        <!-- Wybór godziny -->
+        <div class="form-group">
+            <label for="Time" class="form-label">Godzina</label>
+            <input type="time" class="form-control" id="Time" name="Time" value="" required />
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Description" class="form-label">Opis</label>
+            <textarea asp-for="Description" class="form-control" required></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Location" class="form-label">Lokalizacja</label>
+            <input asp-for="Location" class="form-control" required />
+            <span asp-validation-for="Location" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Dodaj wydarzenie</button>
+    </form>
+</div>
