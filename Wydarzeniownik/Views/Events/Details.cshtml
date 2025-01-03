@@ -1,0 +1,44 @@
+﻿@model Wydarzeniownik.Models.Event
+
+@{
+    ViewData["Title"] = "Szczegóły wydarzenia";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="event-details">
+    <h2>@Model.Title</h2>
+    <p><strong>Data:</strong> @Model.Date.ToString("yyyy-MM-dd HH:mm")</p>
+    <p><strong>Opis:</strong> @Model.Description</p>
+    <p><strong>Lokalizacja:</strong> @Model.Location</p>
+    <p><strong>Polubienia:</strong> @Model.LikeCount</p>
+    <p><strong>Udostępnienia:</strong> @Model.ShareCount</p>
+
+    @if (!string.IsNullOrEmpty(Model.ImagePath))
+    {
+        <div class="event-image mt-3">
+            <img src="@Model.ImagePath" alt="Zdjęcie wydarzenia" class="img-fluid rounded" style="max-width: 100%; height: auto;" />
+        </div>
+    }
+
+    <h3>Komentarze</h3>
+    <ul>
+        @foreach (var comment in Model.Comments)
+        {
+            <li>
+                <strong>@comment.UserName</strong>: @comment.Content
+                <br />
+                <small>@comment.CreatedAt.ToString("yyyy-MM-dd HH:mm")</small>
+            </li>
+        }
+    </ul>
+
+    <h3>Dodaj komentarz</h3>
+    <form action="/Events/AddComment/@Model.Id" method="post">
+        <div class="form-group">
+            <label for="content">Treść komentarza</label>
+            <textarea class="form-control" id="content" name="content" rows="3" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Dodaj komentarz</button>
+    </form>
+</div>
