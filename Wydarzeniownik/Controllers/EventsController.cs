@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
+using System.Security.Claims;
 using Wydarzeniownik.Data;
 using Wydarzeniownik.Models;
 
@@ -16,13 +18,25 @@ namespace Wydarzeniownik.Controllers
         {
             _context = context;
         }
-
+        // Wyświetlenie listy wydarzeń dla obecnie zalogowanego użytkownika
+        [HttpGet("/Events/MyEvents")]
+        public async Task<IActionResult> MyEventsViewerAsync()
+        {
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return View(await _context.Events
+                .Include(e => e.User) // Include the related User entity
+                .Where(e => e.UserId == userId) // Filter by the UserId foreign key
+                .ToListAsync());
+        }
+        
         // Wyświetlenie listy wydarzeń
         public IActionResult EventsViewer()
         {
             var events = _context.Events.ToList();
             return View(events);
         }
+        
+     
 
         // GET: /Events/Create
         [HttpGet("/Events/Create")]
@@ -41,8 +55,13 @@ namespace Wydarzeniownik.Controllers
         [HttpPost("/Events/Create")]
         public IActionResult Create(Event newEvent, string Time)
         {
+
             if (ModelState.IsValid)
             {
+                // UserId zalogowanego usera
+                string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                newEvent.UserId = userId; // Dodajemy do wydarzenia
+
                 // Jeśli pole godziny nie jest puste, ustaw godzinę wydarzenia
                 if (!string.IsNullOrEmpty(Time))
                 {

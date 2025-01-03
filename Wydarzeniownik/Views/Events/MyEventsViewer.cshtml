@@ -1,0 +1,38 @@
+﻿@model List<Wydarzeniownik.Models.Event>
+
+@{
+    ViewData["Title"] = "Wydarzenia";
+}
+
+<div class="container">
+    <h1 class="my-4">Moje Wydarzenia</h1>
+
+    <!-- Przycisk do przejścia do formularza dodawania wydarzenia -->
+    <a href="/Events/Create" class="btn btn-success mb-4">Dodaj nowe wydarzenie</a>
+
+    <!-- Lista wydarzeń -->
+    <div class="events-list">
+        @foreach (var eventItem in Model)
+        {
+            <div class="event-card mb-4 p-3 border rounded shadow-sm">
+                <div class="event-header d-flex justify-content-between">
+                    <h5>@eventItem.Title</h5>
+                    <small>@eventItem.Date.ToString("yyyy-MM-dd HH:mm")</small>
+                </div>
+
+                <p>@eventItem.Description</p>
+
+                <div class="event-footer d-flex justify-content-between">
+                    <span class="event-location">@eventItem.Location</span>
+                    <a href="/Events/Details/@eventItem.Id" class="btn btn-primary btn-sm">Zobacz szczegóły</a>
+                </div>
+
+                <div class="event-reactions mt-3">
+                    <button class="btn btn-outline-primary btn-sm">👍 Lubię to</button>
+                    <button class="btn btn-outline-secondary btn-sm">💬 Komentuj</button>
+                    <button class="btn btn-outline-info btn-sm">🔗 Udostępnij</button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
