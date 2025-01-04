@@ -9,37 +9,37 @@
 
     <form asp-action="Create" enctype="multipart/form-data">
         <div class="form-group">
-            <label asp-for="Title"></label>
-            <input asp-for="Title" class="form-control" />
+            <label asp-for="Title">Tytuł</label>
+            <input asp-for="Title" class="form-control" required />
             <span asp-validation-for="Title" class="text-danger"></span>
         </div>
         <div class="form-group">
-            <label asp-for="Date"></label>
-            <input asp-for="Date" type="date" class="form-control" />
+            <label asp-for="Date">Data</label>
+            <input asp-for="Date" type="date" class="form-control" required />
             <span asp-validation-for="Date" class="text-danger"></span>
         </div>
 
         <!-- Dodajemy pole dla godziny -->
         <div class="form-group">
             <label for="Time">Czas</label>
-            <input type="time" class="form-control" name="Time" id="Time" />
+            <input type="time" class="form-control" name="Time" id="Time" required />
         </div>
 
         <div class="form-group">
-            <label asp-for="Description"></label>
-            <textarea asp-for="Description" class="form-control"></textarea>
+            <label asp-for="Description">Opis</label>
+            <textarea asp-for="Description" class="form-control" required></textarea>
             <span asp-validation-for="Description" class="text-danger"></span>
         </div>
         <div class="form-group">
-            <label asp-for="Location"></label>
-            <input asp-for="Location" class="form-control" />
+            <label asp-for="Location">Lokalizacja</label>
+            <input asp-for="Location" class="form-control" required />
             <span asp-validation-for="Location" class="text-danger"></span>
         </div>
 
         <!-- Pole do przesyłania zdjęcia - tylko obrazy -->
         <div class="form-group">
-            <label for="Image">Zdjęcie (opcjonalne, tylko obraz)</label>
-            <input type="file" class="form-control" name="Image" accept="image/*" />
+            <label for="Image">Zdjęcie</label>
+            <input type="file" class="form-control" name="Image" accept="image/*" required/>
             <span asp-validation-for="ImagePath" class="text-danger"></span>
         </div>
 

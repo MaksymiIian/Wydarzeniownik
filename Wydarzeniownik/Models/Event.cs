@@ -32,5 +32,8 @@ namespace Wydarzeniownik.Models
 
         // Ścieżka do zdjęcia
         public string? ImagePath { get; set; }
+
+        // Dodatkowa właściwość na e-mail użytkownika (autora wydarzenia)
+        public string? UserEmail { get; set; }
     }
 }

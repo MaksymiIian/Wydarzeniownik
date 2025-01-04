@@ -21,22 +21,16 @@
 
             <div class="event-footer d-flex justify-content-between">
                 <span class="event-location">@eventItem.Location</span>
-                <span>👍 @eventItem.LikeCount</span> <!-- Liczba polubień -->
-                <span>🔗 @eventItem.ShareCount</span> <!-- Liczba udostępnień -->
                 <a href="/Events/Details/@eventItem.Id" class="btn btn-primary btn-sm">Zobacz szczegóły</a>
             </div>
 
             <div class="event-reactions mt-3">
                 <!-- Polubienie -->
                 <form action="/Events/Like/@eventItem.Id" method="post">
-                    <button type="submit" class="btn btn-outline-primary btn-sm">👍 Lubię to</button>
-                </form>
-
-                <!-- Udostępnienie -->
-                <form action="/Events/Share/@eventItem.Id" method="post">
-                    <button type="submit" class="btn btn-outline-info btn-sm">🔗 Udostępnij</button>
+                    <button type="submit" class="btn btn-outline-primary btn-sm">👍 Lubię to (@eventItem.LikeCount)</button>
                 </form>
             </div>
         </div>
     }
+
 </div>
