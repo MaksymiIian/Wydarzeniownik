@@ -35,14 +35,13 @@
             <input asp-for="Location" class="form-control" />
             <span asp-validation-for="Location" class="text-danger"></span>
         </div>
-
         <!-- Pole do przesyłania zdjęcia - tylko obrazy -->
         <div class="form-group">
             <label for="Image">Zdjęcie (opcjonalne, tylko obraz)</label>
             <input type="file" class="form-control" name="Image" accept="image/*" />
             <span asp-validation-for="ImagePath" class="text-danger"></span>
         </div>
-
+        
         <button type="submit" class="btn btn-primary">Utwórz</button>
     </form>
 </div>
