@@ -226,6 +226,13 @@ namespace Wydarzeniownik.Controllers
             if (ModelState.IsValid)
             {
                 string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                // Ensure the user exists in the database
+                var userExists = _context.Users.Any(u => u.Id == userId);
+                if (!userExists)
+                {
+                    ModelState.AddModelError("", "The logged-in user does not exist in the database.");
+                    return View(newEvent);
+                }
                 newEvent.UserId = userId;
 
                 string userEmail = User.FindFirstValue(ClaimTypes.Email);
