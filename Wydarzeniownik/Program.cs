@@ -21,7 +21,7 @@ builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
-// Konfiguracja úcieøek
+// Konfiguracja ≈õcie≈ºek
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
