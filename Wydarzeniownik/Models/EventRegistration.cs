@@ -1,18 +1,15 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System;
+﻿using Wydarzeniownik.Models;
+using Microsoft.AspNetCore.Identity;
 
-namespace Wydarzeniownik.Models
+public class EventRegistration
 {
-    public class EventRegistration
-    {
-            public int Id { get; set; }
+    public int Id { get; set; }
+    public int EventId { get; set; }
+    public string UserId { get; set; }
 
-            public string UserId { get; set; }  // ID użytkownika
-            public int EventId { get; set; }    // ID wydarzenia
-            public DateTime RegisteredAt { get; set; }
+    // Dodanie daty rejestracji
+    public DateTime RegisteredAt { get; set; }
 
-        // Nawigacyjne właściwości
-            public virtual IdentityUser User { get; set; }
-            public virtual Event Event { get; set; }
-    }
+    public virtual Event Event { get; set; }
+    public virtual IdentityUser User { get; set; }
 }
