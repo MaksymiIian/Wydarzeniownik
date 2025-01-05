@@ -362,3 +362,5 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /Wydarzeniownik/Program.cs
+/Wydarzeniownik/wwwroot/images/1150pitbulls.jpeg
+/Wydarzeniownik/wwwroot/images/Windows_server_2022-2024-12-01-18-08-55.png
