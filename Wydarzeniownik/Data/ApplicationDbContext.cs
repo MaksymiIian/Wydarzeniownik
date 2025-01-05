@@ -15,6 +15,6 @@ namespace Wydarzeniownik.Data
         public DbSet<Event> Events { get; set; }
         public DbSet<Comments> Comments { get; set; }
         public DbSet<UserLikes> UserLikes { get; set; }
-
+        public DbSet<EventRegistration> EventRegistrations { get; set; }
     }
 }

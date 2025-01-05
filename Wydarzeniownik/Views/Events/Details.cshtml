@@ -7,7 +7,6 @@
 
 <div class="container my-4">
     <div class="card shadow-sm">
-        <!-- Używamy d-flex i justify-content-between, aby tytuł był na środku, a przyciski na prawej stronie -->
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
             <h2 class="m-0">@Model.Title</h2>
 
@@ -51,8 +50,56 @@
             <hr />
             <div class="d-flex justify-content-between">
                 <p><strong>Polubienia:</strong> @Model.LikeCount</p>
-                @* <p><strong>Udostępnienia:</strong> @Model.ShareCount</p> *@
             </div>
+
+            <!-- Formularz do rejestracji na wydarzenie -->
+            @if (User.Identity.IsAuthenticated)
+            {
+                string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                // Sprawdzamy, czy użytkownik jest zapisany na wydarzenie
+                var isRegistered = Model.EventRegistrations.Any(er => er.UserId == userId);
+
+                <p>
+                    <strong>Status zapisu:</strong>
+                    @if (isRegistered)
+                    {
+                        <span class="text-success">Zapisany</span>
+                    }
+                    else
+                    {
+                        <span class="text-danger">Niezapisany</span>
+                    }
+                </p>
+
+                <form action="@Url.Action("Register", "Events", new { eventId = Model.Id })" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <!-- Przycisk zapisu/wyrejestrowania -->
+                    <button type="submit" class="btn @if (isRegistered) {
+                <span>btn-danger</span>
+} else {
+                <span>btn-success</span>
+} mt-3">
+                        @if (isRegistered)
+                        {
+                            <span>Wyrejestruj się</span>
+                        }
+                        else
+                        {
+                            <span>Zapisz się na wydarzenie</span>
+                        }
+                    </button>
+                </form>
+            }
+
+            <!-- Wyświetlanie komunikatu o zapisie -->
+            @if (TempData["Message"] != null)
+            {
+                <div class="alert alert-info mt-3">
+                    @TempData["Message"]
+                </div>
+            }
         </div>
     </div>
 

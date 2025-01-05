@@ -53,6 +53,7 @@ namespace Wydarzeniownik.Controllers
         {
             var eventItem = _context.Events
                 .Include(e => e.Comments)
+                .Include(e => e.EventRegistrations) // Dołączamy rejestracje
                 .FirstOrDefault(e => e.Id == id);
 
             if (eventItem == null)
@@ -307,6 +308,51 @@ namespace Wydarzeniownik.Controllers
             }
 
             return View(newEvent);
+        }
+
+        // Akcja do zapisania się na wydarzenie
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register(int eventId)
+        {
+            var eventItem = await _context.Events
+                                          .Include(e => e.EventRegistrations)
+                                          .FirstOrDefaultAsync(e => e.Id == eventId);
+
+            if (eventItem == null)
+            {
+                return NotFound();
+            }
+
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Sprawdzenie, czy użytkownik jest już zapisany
+            var existingRegistration = eventItem.EventRegistrations
+                                                .FirstOrDefault(er => er.UserId == userId);
+
+            if (existingRegistration == null)
+            {
+                // Dodanie zapisu na wydarzenie
+                var registration = new EventRegistration
+                {
+                    EventId = eventId,
+                    UserId = userId,
+                    RegisteredAt = DateTime.Now // Zapis daty rejestracji
+                };
+                _context.EventRegistrations.Add(registration);
+                await _context.SaveChangesAsync();
+                TempData["Message"] = "Zapisano na wydarzenie!";
+            }
+            else
+            {
+                // Usunięcie zapisu
+                _context.EventRegistrations.Remove(existingRegistration);
+                await _context.SaveChangesAsync();
+                TempData["Message"] = "Wyrejestrowano z wydarzenia!";
+            }
+
+            // Przekierowanie do szczegółów wydarzenia
+            return RedirectToAction("Details", new { id = eventId });
         }
     }
 }

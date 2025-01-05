@@ -35,5 +35,6 @@ namespace Wydarzeniownik.Models
 
         // Dodatkowa właściwość na e-mail użytkownika (autora wydarzenia)
         public string? UserEmail { get; set; }
+        public virtual ICollection<EventRegistration> EventRegistrations { get; set; } = new List<EventRegistration>();
     }
 }
