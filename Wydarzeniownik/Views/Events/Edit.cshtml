@@ -38,7 +38,7 @@
     <!-- Pole do przesyłania zdjęcia - tylko obrazy -->
     <div class="form-group">
         <label for="Image">Zdjęcie</label>
-        <input type="file" class="form-control" name="Image" accept="image/*" required />
+        <input type="file" class="form-control" name="Image" accept="image/*" />
         <span asp-validation-for="ImagePath" class="text-danger"></span>
     </div>
 
@@ -46,3 +46,11 @@
 </form>
 
 <a href="@Url.Action("EventsViewer")" class="btn btn-secondary">Powrót do listy wydarzeń</a>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const timeField = document.getElementById('Time');
+        const existingDate = '@Model.Date.ToString("HH:mm")';
+        timeField.value = existingDate;
+    });
+</script>

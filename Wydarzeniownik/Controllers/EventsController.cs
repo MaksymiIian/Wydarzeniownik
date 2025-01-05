@@ -33,10 +33,19 @@ namespace Wydarzeniownik.Controllers
         }
 
         // Wyświetlenie listy wydarzeń
-        public IActionResult EventsViewer()
+        public IActionResult EventsViewer(string sortOrder)
         {
-            var events = _context.Events.ToList();
-            return View(events);
+            var events = _context.Events.AsQueryable();
+
+            // Obsługa sortowania
+            events = sortOrder switch
+            {
+                "date_desc" => events.OrderByDescending(e => e.Date),
+                "date_asc" => events.OrderBy(e => e.Date),
+                _ => events
+            };
+
+            return View(events.ToList());
         }
 
         // Wyświetlenie szczegółów wydarzenia
@@ -56,80 +65,98 @@ namespace Wydarzeniownik.Controllers
 
         // Edycja wydarzenia (formularz)
         [HttpGet("/Events/Edit/{id}")]
-        public async Task<IActionResult> Edit(int id)
+        public IActionResult Edit(int id)
         {
-            var eventItem = await _context.Events.FindAsync(id);
+            var eventItem = _context.Events.FirstOrDefault(e => e.Id == id);
             if (eventItem == null)
             {
                 return NotFound();
             }
+
+            // Sprawdzenie, czy obecny użytkownik jest autorem wydarzenia
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (eventItem.UserId != userId)
+            {
+                return Forbid();
+            }
+
             return View(eventItem);
         }
 
-        // Edycja wydarzenia (zapis)
+        // Edycja wydarzenia (zapis z obsługą godziny i obrazu)
         [HttpPost("/Events/Edit/{id}")]
-        public async Task<IActionResult> Edit(int id, Event updatedEvent, string Time, IFormFile Image)
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(int id, Event updatedEvent, string Time, IFormFile Image)
         {
             if (id != updatedEvent.Id)
+            {
+                return BadRequest();
+            }
+
+            var existingEvent = _context.Events.FirstOrDefault(e => e.Id == id);
+            if (existingEvent == null)
             {
                 return NotFound();
             }
 
+            // Sprawdzenie, czy obecny użytkownik jest autorem wydarzenia
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (existingEvent.UserId != userId)
+            {
+                return Forbid();
+            }
+
             if (ModelState.IsValid)
             {
-                try
+                existingEvent.Title = updatedEvent.Title;
+                existingEvent.Description = updatedEvent.Description;
+                existingEvent.Location = updatedEvent.Location;
+
+                // Obsługa godziny
+                if (!string.IsNullOrEmpty(Time))
                 {
-                    var eventItem = await _context.Events.FindAsync(id);
-                    if (eventItem == null)
+                    try
                     {
-                        return NotFound();
+                        var timeSpan = TimeSpan.Parse(Time);
+                        existingEvent.Date = updatedEvent.Date.Date + timeSpan;
                     }
-
-                    // Aktualizacja danych wydarzenia
-                    eventItem.Title = updatedEvent.Title;
-                    eventItem.Description = updatedEvent.Description;
-                    eventItem.Location = updatedEvent.Location;
-                    eventItem.Date = updatedEvent.Date;
-
-                    // Aktualizacja zdjęcia (jeśli przesłano nowe)
-                    if (Image != null && Image.Length > 0)
+                    catch (FormatException)
                     {
-                        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" }; // Dozwolone rozszerzenia obrazów
-                        var extension = Path.GetExtension(Image.FileName).ToLower();
-
-                        if (allowedExtensions.Contains(extension))
-                        {
-                            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", Image.FileName);
-                            using (var stream = new FileStream(filePath, FileMode.Create))
-                            {
-                                Image.CopyTo(stream);
-                            }
-
-                            eventItem.ImagePath = $"/images/{Image.FileName}"; // Zapisywanie ścieżki zdjęcia w modelu
-                        }
-                    }
-
-                    _context.Update(eventItem);
-                    await _context.SaveChangesAsync();
-
-                    return RedirectToAction("EventsViewer");
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!_context.Events.Any(e => e.Id == id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
+                        ModelState.AddModelError("Time", "Nieprawidłowy format godziny.");
+                        return View(updatedEvent);
                     }
                 }
+
+                // Obsługa nowego obrazu
+                if (Image != null && Image.Length > 0)
+                {
+                    var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+                    var extension = Path.GetExtension(Image.FileName).ToLower();
+
+                    if (!allowedExtensions.Contains(extension))
+                    {
+                        ModelState.AddModelError("Image", "Dozwolone są tylko obrazy: jpg, jpeg, png, gif.");
+                        return View(updatedEvent);
+                    }
+
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", Image.FileName);
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        Image.CopyTo(stream);
+                    }
+
+                    existingEvent.ImagePath = $"/images/{Image.FileName}";
+                }
+
+                _context.Update(existingEvent);
+                _context.SaveChanges();
+
+                return RedirectToAction("Details", new { id = existingEvent.Id });
             }
+
             return View(updatedEvent);
         }
 
-        // Usuwanie wydarzenia
         // Usuwanie wydarzenia
         [HttpPost("/Events/Delete/{id}")]
         [ValidateAntiForgeryToken]
@@ -226,6 +253,7 @@ namespace Wydarzeniownik.Controllers
             if (ModelState.IsValid)
             {
                 string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
                 // Ensure the user exists in the database
                 var userExists = _context.Users.Any(u => u.Id == userId);
                 if (!userExists)
@@ -233,8 +261,8 @@ namespace Wydarzeniownik.Controllers
                     ModelState.AddModelError("", "The logged-in user does not exist in the database.");
                     return View(newEvent);
                 }
-                newEvent.UserId = userId;
 
+                newEvent.UserId = userId;
                 string userEmail = User.FindFirstValue(ClaimTypes.Email);
                 newEvent.UserEmail = userEmail;
 

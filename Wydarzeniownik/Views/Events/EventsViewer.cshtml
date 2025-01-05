@@ -8,6 +8,12 @@
 
 <a href="/Events/Create" class="btn btn-success mb-4">Dodaj nowe wydarzenie</a>
 
+<!-- Przyciski sortowania -->
+<div class="sort-buttons mb-3">
+    <a href="/Events?sortOrder=date_asc" class="btn btn-outline-primary">Sortuj od najstarszych</a>
+    <a href="/Events?sortOrder=date_desc" class="btn btn-outline-primary">Sortuj od najnowszych</a>
+</div>
+
 <div class="events-list">
     @foreach (var eventItem in Model)
     {
@@ -25,12 +31,10 @@
             </div>
 
             <div class="event-reactions mt-3">
-                <!-- Polubienie -->
                 <form action="/Events/Like/@eventItem.Id" method="post">
                     <button type="submit" class="btn btn-outline-primary btn-sm">👍 Lubię to (@eventItem.LikeCount)</button>
                 </form>
             </div>
         </div>
     }
-
 </div>
